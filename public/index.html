@@ -75,26 +75,21 @@
             .then(snap => {
               console.log(snap);
               todoList.push(snap);
-              render();
+              render(todoList);
               input.value = "";
             });
         }
 
         function onListClicked(event) {
           let button = event.target;
-          let i = button.dataset.id;
-          let moveTodo = todoList.splice(i, 1);
-          db.collection("todos").doc(i).delete()
-            .then(() => {
-              render();
-            })
-            .catch(error => {
-              console.error('Error removing document...', error);
-            });
+          let id = button.dataset.id;
+          todoList.splice(id, 1);
+          db.collection("todos").doc(id).delete();
+          render(todoList);
         }
 
-        function render() {
-          let content = todoList.map(item => {
+        function render(items) {
+          let content = items.map(item => {
             let data = item.data();
             return '<li>' + data.content + ' <button data-id="' + item.id +'"> DELETE </button></li>';
           });
