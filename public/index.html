@@ -52,16 +52,18 @@
         const db = firebase.firestore();
 
         let todoList = [];
+        let htmlList = document.getElementById("todo-list");
+        const btn = document.getElementById("add-btn");
 
         // read data
         db.collection('todos').get().then(snap => {
           todoList = snap.docs;
-          console.log(snap);
+          console.log(todoList);
           render(todoList);
         })
 
-        const btn = document.getElementById("add-btn");
         btn.addEventListener("click", addItem);
+        htmlList.addEventListener('click', onListClicked);
         
         function addItem() {
           let input = document.getElementById("new-item");
@@ -78,11 +80,23 @@
             });
         }
 
+        function onListClicked(event) {
+          let button = event.target;
+          let i = button.dataset.id;
+          let moveTodo = todoList.splice(i, 1);
+          db.collection("todos").doc(i).delete()
+            .then(() => {
+              render();
+            })
+            .catch(error => {
+              console.error('Error removing document...', error);
+            });
+        }
+
         function render() {
-          let htmlList = document.getElementById("todo-list");
           let content = todoList.map(item => {
             let data = item.data();
-            return '<li>' + data.content + '</li>';
+            return '<li>' + data.content + ' <button data-id="' + item.id +'"> DELETE </button></li>';
           });
 
           htmlList.innerHTML = content.join("");
