@@ -82,9 +82,15 @@
 
         function onListClicked(event) {
           let button = event.target;
-          let id = button.dataset.id;
+          let id = button.dataset.id || "0";
           todoList.splice(id, 1);
-          db.collection("todos").doc(id).delete();
+          db.collection("todos").doc(id).delete()
+            .then(() => {
+              location.reload(true);
+            })
+            .catch(error => {
+              console.error('Error', error);
+            });
           render(todoList);
         }
 
